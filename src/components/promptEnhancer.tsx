@@ -7,19 +7,19 @@ const PromptEnhancer = ({
   showEnhancePrompt,
   setEnhanceText,
   enhanceText,
-  setOptions,
-  options,
+  setPromptOptions,
+  promptOptions,
 }: {
   setShowEnhancePrompt: React.Dispatch<React.SetStateAction<boolean>>;
   showEnhancePrompt: boolean;
   setEnhanceText: React.Dispatch<React.SetStateAction<EnhanceTextType>>;
   enhanceText: EnhanceTextType;
-  setOptions: React.Dispatch<React.SetStateAction<EnhanceOptionsType>>;
-  options: EnhanceOptionsType;
+  setPromptOptions: React.Dispatch<React.SetStateAction<EnhanceOptionsType>>;
+  promptOptions: EnhanceOptionsType;
 }) => {
   const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setOptions((prev) => ({ ...prev, [name]: checked }));
+    setPromptOptions((prev) => ({ ...prev, [name]: checked }));
   };
 
   return (
@@ -44,7 +44,7 @@ const PromptEnhancer = ({
             <CheckboxWithInput
               name="defineRole"
               label="Define Assistant Role"
-              checked={options.defineRole}
+              checked={promptOptions.defineRole}
               onCheckboxChange={handleOptionChange}
               inputValue={enhanceText.roleDescription}
               onInputChange={(e) =>
@@ -61,7 +61,7 @@ const PromptEnhancer = ({
             <CheckboxWithInput
               name="provideContext"
               label="Provide Context"
-              checked={options.provideContext}
+              checked={promptOptions.provideContext}
               onCheckboxChange={handleOptionChange}
               inputValue={enhanceText.context}
               onInputChange={(e) =>
@@ -78,7 +78,7 @@ const PromptEnhancer = ({
             <CheckboxWithInput
               name="setFormat"
               label="Structured Format"
-              checked={options.setFormat}
+              checked={promptOptions.setFormat}
               onCheckboxChange={handleOptionChange}
               inputValue={enhanceText.formatInstructions}
               onInputChange={(e) =>
@@ -95,7 +95,7 @@ const PromptEnhancer = ({
             <CheckboxWithInput
               name="examples"
               label="Include Examples"
-              checked={options.examples}
+              checked={promptOptions.examples}
               onCheckboxChange={handleOptionChange}
               inputValue={enhanceText.exampleInstructions}
               onInputChange={(e) =>
@@ -112,7 +112,7 @@ const PromptEnhancer = ({
             <CheckboxWithInput
               name="constraints"
               label="Add Constraints"
-              checked={options.constraints}
+              checked={promptOptions.constraints}
               onCheckboxChange={handleOptionChange}
               inputValue={enhanceText.constraintsText}
               onInputChange={(e) =>
@@ -130,7 +130,7 @@ const PromptEnhancer = ({
               <input
                 type="checkbox"
                 name="cot"
-                checked={options.cot}
+                checked={promptOptions.cot}
                 onChange={handleOptionChange}
                 className="h-4 w-4"
               />

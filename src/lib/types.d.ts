@@ -9,12 +9,12 @@ type EnhanceTextType = {
 type EnhanceOptionsType = {
   defineRole: boolean;
   provideContext: boolean;
-  beSpecific: boolean;
   setFormat: boolean;
   examples: boolean;
   constraints: boolean;
   cot: boolean;
 };
+
 type EnhanceTextProps = {
   setShowEnhancePrompt: React.Dispatch<React.SetStateAction<boolean>>;
   showEnhancePrompt: boolean;
@@ -22,4 +22,14 @@ type EnhanceTextProps = {
   enhanceText: EnhanceTextType;
   setOptions: React.Dispatch<React.SetStateAction<EnhanceOptionsType>>;
   options: EnhanceOptionsType;
+};
+
+type Evaluation = {
+  id: string;
+  prompt: string;
+  response: string;
+  score: number;
+  feedback: string;
+  options: object;
+  created_at: string;
 };

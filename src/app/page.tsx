@@ -6,8 +6,8 @@ import { Button } from "@/components/ui/button";
 import PromptEnhancer from "@/components/promptEnhancer";
 import PromptGuide from "@/components/promptOrderGuide";
 import PromptEngineeringAdvice from "@/components/promptEngineeringAdvice";
-
-const SUPABASE_URL = "https://xtmzpyqwdxspyifzbspv.supabase.co";
+import { evaluateResponse } from "@/utils/evaluateResponse";
+import ReactMarkdown from "react-markdown";
 
 export default function Chat() {
   const {
@@ -16,26 +16,25 @@ export default function Chat() {
     handleInputChange,
     handleSubmit: originalSubmit,
   } = useChat({
-    onFinish: (message, options) => {
-      /* console.log("Stream finished:", message); */
-      console.log("Options:", options);
+    onFinish: async (message, options) => {
+      const evaluationPrompt = {
+        prompt: enhancedPrompt,
+        response: message.content,
+        usage: options.usage,
+        options: promptOptions,
+      };
+      await evaluateResponse(evaluationPrompt);
     },
   });
 
-  const [options, setOptions] = useState({
+  const [promptOptions, setPromptOptions] = useState({
     defineRole: false,
     provideContext: false,
-    beSpecific: false,
     setFormat: false,
     examples: false,
     constraints: false,
     cot: false,
   });
-  /* const [context, setContext] = useState<string>("");
-  const [roleDescription, setRoleDescription] = useState("");
-  const [formatInstructions, setFormatInstructions] = useState("");
-  const [exampleInstructions, setExampleInstructions] = useState("");
-  const [constraintsText, setConstraintsText] = useState(""); */
   const [enhanceText, setEnhanceText] = useState<EnhanceTextType>({
     context: "",
     roleDescription: "",
@@ -45,7 +44,7 @@ export default function Chat() {
   });
 
   const [showGuide, setShowGuide] = useState(false);
-  const [showEnhancePrompt, setShowEnhancePrompt] = useState(true);
+  const [showEnhancePrompt, setShowEnhancePrompt] = useState(false);
 
   useEffect(() => {
     const lastMessage = document.querySelector("#chat-bottom");
@@ -54,49 +53,47 @@ export default function Chat() {
 
   const enhancedPrompt = useMemo(() => {
     let enhanced = input;
-    if (options.defineRole) {
+    if (promptOptions.defineRole) {
       enhanced =
         `You are ${
           enhanceText.roleDescription ||
           "an expert in this field with 10+ years of experience"
         }. ` + enhanced;
     }
-    if (options.provideContext) {
+    if (promptOptions.provideContext) {
       enhanced += enhanceText.context;
     }
 
-    if (options.setFormat) {
+    if (promptOptions.setFormat) {
       enhanced +=
         " " +
         (enhanceText.formatInstructions ||
           "Format your response with clear headings, bullet points, and numbered steps where appropriate.");
     }
-    if (options.examples) {
+    if (promptOptions.examples) {
       enhanced +=
         " " +
         (enhanceText.exampleInstructions ||
           "Provide a relevant example to illustrate your points.");
     }
-    if (options.constraints) {
+    if (promptOptions.constraints) {
       enhanced +=
         " " +
         (enhanceText.constraintsText ||
           "Include only verified information from reliable sources.");
     }
-    if (options.cot) {
+    if (promptOptions.cot) {
       enhanced += " " + "Reason step-by-step before answering.";
     }
     return enhanced;
-  }, [input, options, enhanceText]);
+  }, [input, promptOptions, enhanceText]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    /*  const finalPrompt = enhancedPrompt(input); */
     try {
       originalSubmit(e, {
         body: {
           finalPrompt: enhancedPrompt,
-          options: options,
           clearHistory: true,
         },
       });
@@ -107,7 +104,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col justify-between items-center min-h-screen w-full max-w-3xl mx-auto">
+    <div className="flex flex-col justify-between items-center min-h-[97vh] w-full max-w-3xl mx-auto">
       <Button
         onClick={() => setShowGuide(!showGuide)}
         className="fixed top-4 right-4 z-50"
@@ -124,7 +121,7 @@ export default function Chat() {
       </div>
       <section className="flex flex-col pt-2 h-full lg:max-h-[85vh] overflow-scroll w-full">
         {messages.length < 1 ? (
-          <p className="font-semibold text-black/70 text-center mt-10">
+          <p className="font-semibold text-black/70 text-center mt-6">
             Send a message to initiate the chat
           </p>
         ) : (
@@ -143,7 +140,9 @@ export default function Chat() {
               {message.parts.map(
                 (part, i) =>
                   part.type === "text" && (
-                    <div key={`${message.id}-${i}`}>{part.text}</div>
+                    <ReactMarkdown key={`${message.id}-${i}`}>
+                      {part.text}
+                    </ReactMarkdown>
                   )
               )}
             </div>
@@ -153,7 +152,6 @@ export default function Chat() {
       </section>
 
       <section className="sticky bottom-2 w-full max-w-3xl bg-gray-200 p-2 sm:p-4 shadow-lg space-y-2 rounded-3xl border">
-        {/* <section className="w-full max-w-3xl bg-gray-200 p-4 shadow-lg space-y-2 rounded-3xl"> */}
         <form
           onSubmit={handleSubmit}
           className="w-full space-y-2 text-black/80"
@@ -184,84 +182,11 @@ export default function Chat() {
             setEnhanceText={setEnhanceText}
             setShowEnhancePrompt={setShowEnhancePrompt}
             showEnhancePrompt={showEnhancePrompt}
-            setOptions={setOptions}
-            options={options}
+            setPromptOptions={setPromptOptions}
+            promptOptions={promptOptions}
           />
         </form>
       </section>
     </div>
   );
 }
-
-/* <Button onClick={() => setShowEnhancePrompt(!showEnhancePrompt)} className="">
-  {showEnhancePrompt ? "Hide Enhancer" : "Prompt Enhancer"}
-</Button>;
-
-{
-  showEnhancePrompt && (
-    <article className="relative flex flex-col p-4 pb-2 bg-gray-200 border rounded-lg">
-      <h3 className="font-bold mb-3">Enhance Your Prompt</h3>
-      <div className="grid gap-2">
-        <CheckboxWithInput
-          name="defineRole"
-          label="Define Assistant Role"
-          checked={options.defineRole}
-          onCheckboxChange={handleOptionChange}
-          inputValue={roleDescription}
-          onInputChange={(e) => setRoleDescription(e.target.value)}
-          placeholder="e.g., a helpful travel agent, a senior Python developer, a critical editor"
-          inputType="text"
-          inputLabel="Specify the Assistant’s Role:"
-        />
-
-        <CheckboxWithInput
-          name="provideContext"
-          label="Provide Context"
-          checked={options.provideContext}
-          onCheckboxChange={handleOptionChange}
-          inputValue={context}
-          onInputChange={(e) => setContext(e.target.value)}
-          placeholder="Explain your situation, project, or what you need this information for..."
-          inputType="textarea"
-          inputLabel="Additional Context (optional):"
-        />
-
-        <CheckboxWithInput
-          name="setFormat"
-          label="Structured Format"
-          checked={options.setFormat}
-          onCheckboxChange={handleOptionChange}
-          inputValue={formatInstructions}
-          onInputChange={(e) => setFormatInstructions(e.target.value)}
-          placeholder="e.g., 'Respond in valid JSON format.', 'Use markdown for headings and code blocks.'"
-          inputType="textarea"
-          inputLabel="Desired Output Format Instructions:"
-        />
-
-        <CheckboxWithInput
-          name="examples"
-          label="Include Examples"
-          checked={options.examples}
-          onCheckboxChange={handleOptionChange}
-          inputValue={exampleInstructions}
-          onInputChange={(e) => setExampleInstructions(e.target.value)}
-          placeholder="e.g., '3 simple examples', 'one code example in Python'"
-          inputType="text"
-          inputLabel="Specify Examples Needed:"
-        />
-
-        <CheckboxWithInput
-          name="constraints"
-          label="Add Constraints"
-          checked={options.constraints}
-          onCheckboxChange={handleOptionChange}
-          inputValue={constraintsText}
-          onInputChange={(e) => setConstraintsText(e.target.value)}
-          placeholder="e.g., 'Keep under 300 words.', 'Avoid technical jargon.'"
-          inputType="textarea"
-          inputLabel="Add Specific Constraints:"
-        />
-      </div>
-    </article>
-  );
-} */
