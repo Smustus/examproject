@@ -38,28 +38,34 @@ export default function CheckboxWithInput({
         <span>{label}</span>
       </label>
 
-      {checked && (
-        <div className="">
-          <label className="block text-sm font-medium mb-1">{inputLabel}</label>
-          {inputType === "textarea" ? (
-            <textarea
-              className="w-full p-2 border border-gray-300 rounded bg-white"
-              placeholder={placeholder}
-              value={inputValue}
-              rows={2}
-              onChange={onInputChange}
-            />
-          ) : (
-            <input
-              type="text"
-              className="w-full p-2 border border-gray-300 rounded bg-white"
-              placeholder={placeholder}
-              value={inputValue}
-              onChange={onInputChange}
-            />
-          )}
-        </div>
-      )}
+      <div
+        className={`transition-all duration-400 ease-out overflow-hidden transform ${
+          checked
+            ? "max-h-40 opacity-100 translate-y-0"
+            : "max-h-0 opacity-0 -translate-y-2"
+        }`}
+      >
+        <label className="block text-sm font-medium mb-1 mt-1">
+          {inputLabel}
+        </label>
+        {inputType === "textarea" ? (
+          <textarea
+            className="w-full p-2 border border-gray-300 focus:border-gray-400 rounded bg-white outline-none"
+            placeholder={placeholder}
+            value={inputValue}
+            rows={2}
+            onChange={onInputChange}
+          />
+        ) : (
+          <input
+            type="text"
+            className="w-full p-2 border border-gray-300 focus:border-gray-400 rounded bg-white outline-none"
+            placeholder={placeholder}
+            value={inputValue}
+            onChange={onInputChange}
+          />
+        )}
+      </div>
     </div>
   );
 }
