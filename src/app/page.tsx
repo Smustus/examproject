@@ -7,7 +7,7 @@ import PromptEnhancer from "@/components/promptEnhancer";
 import PromptGuide from "@/components/promptOrderGuide";
 import PromptEngineeringAdvice from "@/components/promptEngineeringAdvice";
 import { evaluateResponse } from "@/utils/evaluateResponse";
-import ReactMarkdown from "react-markdown";
+import ChatMessage from "@/components/chatMessage";
 
 export default function Chat() {
   const {
@@ -45,6 +45,7 @@ export default function Chat() {
 
   const [showGuide, setShowGuide] = useState(false);
   const [showEnhancePrompt, setShowEnhancePrompt] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const lastMessage = document.querySelector("#chat-bottom");
@@ -83,7 +84,9 @@ export default function Chat() {
           "Include only verified information from reliable sources.");
     }
     if (promptOptions.cot) {
-      enhanced += " " + "Reason step-by-step before answering.";
+      enhanced +=
+        " " +
+        "Reason step-by-step (Chain of thought) and take pauses before answering.";
     }
     return enhanced;
   }, [input, promptOptions, enhanceText]);
@@ -91,6 +94,7 @@ export default function Chat() {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
+      setIsSubmitting(true);
       originalSubmit(e, {
         body: {
           finalPrompt: enhancedPrompt,
@@ -100,11 +104,22 @@ export default function Chat() {
     } catch (err) {
       console.error("Submit failed:", err);
       alert("There was an error sending your message. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
   return (
     <div className="flex flex-col justify-between items-center min-h-[97vh] w-full max-w-3xl mx-auto">
+      <PromptEnhancer
+        enhanceText={enhanceText}
+        setEnhanceText={setEnhanceText}
+        setShowEnhancePrompt={setShowEnhancePrompt}
+        showEnhancePrompt={showEnhancePrompt}
+        setPromptOptions={setPromptOptions}
+        promptOptions={promptOptions}
+      />
+
       <Button
         onClick={() => setShowGuide(!showGuide)}
         className="fixed top-4 right-4 z-50"
@@ -113,7 +128,7 @@ export default function Chat() {
       </Button>
 
       <div
-        className={`fixed top-0 right-0 h-full w-full max-w-[450px] xl:max-w-[600px] bg-gray-100 shadow-lg border transition-transform duration-300 ease-in-out z-40 overflow-scroll
+        className={`fixed top-0 right-0 h-full w-full max-w-[450px] xl:max-w-[450px] 2xl:max-w-[500px] bg-gray-100 shadow-lg border transition-transform duration-300 ease-in-out z-40 overflow-scroll
     ${showGuide ? "translate-x-0" : "translate-x-full"}`}
       >
         <PromptEngineeringAdvice />
@@ -121,31 +136,12 @@ export default function Chat() {
       </div>
       <section className="flex flex-col pt-2 h-full lg:max-h-[85vh] overflow-scroll w-full">
         {messages.length < 1 ? (
-          <p className="font-semibold text-black/70 text-center mt-6">
+          <p className="font-semibold text-black/70 text-center mt-14">
             Send a message to initiate the chat
           </p>
         ) : (
           messages.map((message) => (
-            <div
-              key={message.id}
-              className="whitespace-pre-wrap my-1 p-3 bg-gray-100 rounded-lg shadow-md"
-            >
-              <strong
-                className={
-                  message.role === "user" ? "text-blue-600" : "text-green-600"
-                }
-              >
-                {message.role === "user" ? "You: " : "Assistant: "}
-              </strong>
-              {message.parts.map(
-                (part, i) =>
-                  part.type === "text" && (
-                    <ReactMarkdown key={`${message.id}-${i}`}>
-                      {part.text}
-                    </ReactMarkdown>
-                  )
-              )}
-            </div>
+            <ChatMessage key={message.id} message={message} />
           ))
         )}
         <div id="chat-bottom" />
@@ -169,22 +165,26 @@ export default function Chat() {
               placeholder="Type your message here..."
               onChange={handleInputChange}
             />
-            <Button type="submit" className="rounded-lg transition mr-2">
-              Send
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="rounded-lg transition mr-2"
+            >
+              {isSubmitting ? "Processing..." : "Send"}
             </Button>
           </div>
           <p className="text-xs text-black/60 mt-2 ml-1">
             Tip: Use the prompt enhancer to improve your prompt. For complex
             queries, combine multiple options.
           </p>
-          <PromptEnhancer
+          {/* <PromptEnhancer
             enhanceText={enhanceText}
             setEnhanceText={setEnhanceText}
             setShowEnhancePrompt={setShowEnhancePrompt}
             showEnhancePrompt={showEnhancePrompt}
             setPromptOptions={setPromptOptions}
             promptOptions={promptOptions}
-          />
+          /> */}
         </form>
       </section>
     </div>

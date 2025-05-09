@@ -19,20 +19,21 @@ export async function POST(req: Request) {
 
     const systemInstruction = `
     You are an expert AI grader. Evaluate the assistant's response to a user's prompt.
-    Rate the response on correctness, relevance, completeness, and tone.
+    Rate the response on accuracy, aesthetics, correctness, relevance, completeness, and tone.
     Return your evaluation in the following strict JSON format:
+    The score system should reflect the interval from 1 = the response did not adress the prompt at all to 100 = the response was comprehensive, understandable and fully accurate.
     
     {
       "prompt": ${JSON.stringify(prompt)},
       "response": ${JSON.stringify(response)},
-      "score": 1-10,
+      "score": 1-100,
       "feedback": "<detailed explanation>",
       "usage": ${JSON.stringify(usage)},
       "options": ${JSON.stringify(options)},
     }
     `;
     const result = await generateText({
-      model: openai("gpt-4o"),
+      model: openai("o4-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini
       temperature: 0.5,
       topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered
       topK: 20, //Only sample from the top K options for each subsequent token.

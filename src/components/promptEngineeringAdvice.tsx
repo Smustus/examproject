@@ -60,9 +60,9 @@ const guideSteps = [
 
 export default function PromptEngineeringAdvice() {
   return (
-    <section className="max-w-3xl mx-auto p-6 md:p-8 space-y-4">
+    <section className="max-w-3xl mx-auto p-4 md:p-6 space-y-4">
       <div className="text-center">
-        <h2 className="text-3xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-black/90 via-black/70 to-black/80 pb-4 ">
+        <h2 className="text-3xl md:text-3xl mt-14 sm:mt-10 font-bold text-transparent bg-clip-text bg-gradient-to-r from-black/90 via-black/70 to-black/80 pb-4 ">
           Prompt Engineering Guide
         </h2>
       </div>

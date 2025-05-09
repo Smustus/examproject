@@ -11,7 +11,7 @@ export async function POST(req: Request) {
   const messages = data.messages;
 
   const result = streamText({
-    model: openai("o3-mini"),
+    model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini
     temperature: 0.5,
     topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered
     topK: 20, //Only sample from the top K options for each subsequent token.

@@ -1,6 +1,7 @@
 import React from "react";
 import CheckboxWithInput from "./ui/checkboxWithInput";
 import { Button } from "./ui/button";
+import CustomCheckbox from "./ui/checkbox";
 
 const PromptEnhancer = ({
   setShowEnhancePrompt,
@@ -26,119 +27,114 @@ const PromptEnhancer = ({
     <>
       <Button
         onClick={() => setShowEnhancePrompt(!showEnhancePrompt)}
-        className=""
+        className="fixed top-4 left-4 z-50"
       >
-        {showEnhancePrompt ? "Hide Enhancer" : "Prompt Enhancer"}
+        {showEnhancePrompt ? "Hide" : "Prompt Enhancer"}
       </Button>
 
-      {showEnhancePrompt && (
-        <article
-          className={`relative flex flex-col p-2 pb-0 border rounded-lg transition-transform duration-300 ease-out ${
-            showEnhancePrompt
-              ? "max-h-full opacity-100 translate-y-0"
-              : "max-h-0 opacity-0 -translate-y-2"
-          }`}
-        >
-          <h3 className="font-bold mb-3">Enhance Your Prompt</h3>
-          <div className="grid gap-2">
-            <CheckboxWithInput
-              name="defineRole"
-              label="Define Assistant Role"
-              checked={promptOptions.defineRole}
-              onCheckboxChange={handleOptionChange}
-              inputValue={enhanceText.roleDescription}
-              onInputChange={(e) =>
-                setEnhanceText((prevValue) => ({
-                  ...prevValue,
-                  roleDescription: e.target.value,
-                }))
-              }
-              placeholder="e.g., a helpful travel agent, a senior Javascript developer, a critical editor"
-              inputType="text"
-              inputLabel="Specify the Assistant’s Role:"
-            />
+      <article
+        className={`fixed top-0 left-0 h-full w-full max-w-[400px] xl:max-w-[450px] p-4 sm:p-6 bg-gray-100 shadow-lg border-r z-40 transition-transform duration-300 ease-in-out
+          ${showEnhancePrompt ? "translate-x-0" : "-translate-x-full"}`}
+      >
+        <h2 className="text-center mb-3 mt-14 sm:mt-10 text-3xl md:text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-black/90 via-black/70 to-black/80 pb-4 ">
+          Enhance Your Prompt
+        </h2>
+        <div className="grid gap-2 overflow-y-auto max-h-[calc(100vh-6rem)]">
+          <CheckboxWithInput
+            name="defineRole"
+            label="Define Assistant Role"
+            checked={promptOptions.defineRole}
+            onCheckboxChange={handleOptionChange}
+            inputValue={enhanceText.roleDescription}
+            onInputChange={(e) =>
+              setEnhanceText((prev) => ({
+                ...prev,
+                roleDescription: e.target.value,
+              }))
+            }
+            placeholder="e.g., a helpful travel agent, a senior Javascript developer, a critical editor"
+            inputType="text"
+            inputLabel="Specify the Assistant’s Role:"
+          />
 
-            <CheckboxWithInput
-              name="provideContext"
-              label="Provide Context"
-              checked={promptOptions.provideContext}
-              onCheckboxChange={handleOptionChange}
-              inputValue={enhanceText.context}
-              onInputChange={(e) =>
-                setEnhanceText((prevValue) => ({
-                  ...prevValue,
-                  context: e.target.value,
-                }))
-              }
-              placeholder="Explain your situation, project, or what you need this information for..."
-              inputType="textarea"
-              inputLabel="Additional Context (optional):"
-            />
+          <CheckboxWithInput
+            name="provideContext"
+            label="Provide Context"
+            checked={promptOptions.provideContext}
+            onCheckboxChange={handleOptionChange}
+            inputValue={enhanceText.context}
+            onInputChange={(e) =>
+              setEnhanceText((prev) => ({
+                ...prev,
+                context: e.target.value,
+              }))
+            }
+            placeholder="Explain your situation, project, or what you need this information for..."
+            inputType="textarea"
+            inputLabel="Additional Context (optional):"
+          />
 
-            <CheckboxWithInput
-              name="setFormat"
-              label="Structured Format"
-              checked={promptOptions.setFormat}
-              onCheckboxChange={handleOptionChange}
-              inputValue={enhanceText.formatInstructions}
-              onInputChange={(e) =>
-                setEnhanceText((prevValue) => ({
-                  ...prevValue,
-                  formatInstructions: e.target.value,
-                }))
-              }
-              placeholder="e.g., 'Respond in valid JSON format.', 'Use markdown for headings and code blocks.'"
-              inputType="textarea"
-              inputLabel="Desired Output Format Instructions:"
-            />
+          <CheckboxWithInput
+            name="setFormat"
+            label="Structured Format"
+            checked={promptOptions.setFormat}
+            onCheckboxChange={handleOptionChange}
+            inputValue={enhanceText.formatInstructions}
+            onInputChange={(e) =>
+              setEnhanceText((prev) => ({
+                ...prev,
+                formatInstructions: e.target.value,
+              }))
+            }
+            placeholder="e.g., 'Respond in valid JSON format.', 'Use markdown for headings and code blocks.'"
+            inputType="textarea"
+            inputLabel="Desired Output Format Instructions:"
+          />
 
-            <CheckboxWithInput
-              name="examples"
-              label="Include Examples"
-              checked={promptOptions.examples}
-              onCheckboxChange={handleOptionChange}
-              inputValue={enhanceText.exampleInstructions}
-              onInputChange={(e) =>
-                setEnhanceText((prevValue) => ({
-                  ...prevValue,
-                  exampleInstructions: e.target.value,
-                }))
-              }
-              placeholder="e.g., '3 simple examples', 'one code example in Python'"
-              inputType="text"
-              inputLabel="Specify Examples Needed:"
-            />
+          <CheckboxWithInput
+            name="examples"
+            label="Include Examples"
+            checked={promptOptions.examples}
+            onCheckboxChange={handleOptionChange}
+            inputValue={enhanceText.exampleInstructions}
+            onInputChange={(e) =>
+              setEnhanceText((prev) => ({
+                ...prev,
+                exampleInstructions: e.target.value,
+              }))
+            }
+            placeholder="e.g., '3 simple examples', 'one code example in Python'"
+            inputType="text"
+            inputLabel="Specify Examples Needed:"
+          />
 
-            <CheckboxWithInput
-              name="constraints"
-              label="Add Constraints"
-              checked={promptOptions.constraints}
-              onCheckboxChange={handleOptionChange}
-              inputValue={enhanceText.constraintsText}
-              onInputChange={(e) =>
-                setEnhanceText((prevValue) => ({
-                  ...prevValue,
-                  constraintsText: e.target.value,
-                }))
-              }
-              placeholder="e.g., 'Keep under 300 words.', 'Avoid technical jargon.'"
-              inputType="textarea"
-              inputLabel="Add Specific Constraints:"
-            />
+          <CheckboxWithInput
+            name="constraints"
+            label="Add Constraints"
+            checked={promptOptions.constraints}
+            onCheckboxChange={handleOptionChange}
+            inputValue={enhanceText.constraintsText}
+            onInputChange={(e) =>
+              setEnhanceText((prev) => ({
+                ...prev,
+                constraintsText: e.target.value,
+              }))
+            }
+            placeholder="e.g., 'Keep under 300 words.', 'Avoid technical jargon.'"
+            inputType="textarea"
+            inputLabel="Add Specific Constraints:"
+          />
 
-            <label className="flex items-center h-10 space-x-2 cursor-pointer">
-              <input
-                type="checkbox"
-                name="cot"
-                checked={promptOptions.cot}
-                onChange={handleOptionChange}
-                className="h-4 w-4"
-              />
-              <span>Step-by-Step Reasoning</span>
-            </label>
-          </div>
-        </article>
-      )}
+          <CustomCheckbox
+            name="cot"
+            checked={promptOptions.cot}
+            onChange={handleOptionChange}
+            /*  className="appearance-none h-5 w-5 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer" */
+            label={`Step-by-Step Reasoning`}
+            description="Chain of Thought"
+          />
+        </div>
+      </article>
     </>
   );
 };
