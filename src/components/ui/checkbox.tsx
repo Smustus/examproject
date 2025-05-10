@@ -7,7 +7,7 @@ type CustomCheckboxProps = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   className?: string;
-  description?: string; // New prop for helper text
+  description?: string;
 };
 
 export default function CustomCheckbox({
@@ -22,66 +22,12 @@ export default function CustomCheckbox({
   const checkboxId = `custom-checkbox-${name}`;
 
   return (
-    <div
-      className={`group relative flex items-center py-3 cursor-pointer ${
-        className || ""
-      }`}
-    >
-      <div className="flex items-center h-5">
-        <input
-          id={checkboxId}
-          type="checkbox"
-          name={name}
-          checked={checked}
-          onChange={onChange}
-          disabled={disabled}
-          className={`
-            absolute h-5 w-5 opacity-0
-            ${disabled ? "" : "cursor-pointer"}
-          `}
-        />
-        <div
-          className={`
-            relative h-5.5 w-5.5 rounded-full border flex items-center justify-center
-            transition-all duration-300 ease-in-out
-            ${
-              disabled
-                ? "bg-gray-100 border-gray-300"
-                : `
-                    bg-white border-gray-300
-                    group-hover:border-gray-400
-                    ${
-                      checked
-                        ? "!border-none bg-gradient-to-br !from-black/70 via-red-900/90 !to-red-900/20"
-                        : ""
-                    }
-                  `
-            }
-            peer-focus-visible:ring-2 peer-focus-visible:ring-blue-500 peer-focus-visible:ring-offset-2
-          `}
-        >
-          <svg
-            className={`
-              h-3 w-3 text-white transition-all duration-200
-              ${checked ? "scale-100 opacity-100" : "scale-75 opacity-0"}
-            `}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <polyline points="20 6 9 17 4 12" />
-          </svg>
-        </div>
-      </div>
-
-      <div className="ml-3 flex flex-col">
-        <label
-          htmlFor={checkboxId}
-          className={`
-            font-semibold leading-5
+    <div className={`relative flex items-center py-3 ${className || ""}`}>
+      {/* <div className="pl-3 flex flex-col"> */}
+      <label
+        htmlFor={checkboxId}
+        className={`
+            font-semibold leading-5 flex items-center group
             ${
               disabled
                 ? "text-gray-400"
@@ -92,7 +38,52 @@ export default function CustomCheckbox({
                   }`
             }
           `}
-        >
+      >
+        <section className="flex items-center h-5 pr-3">
+          <input
+            id={checkboxId}
+            type="checkbox"
+            name={name}
+            checked={checked}
+            onChange={onChange}
+            disabled={disabled}
+            className={`
+            absolute h-5.5 w-5.5 opacity-0 z-5
+            ${disabled ? "" : "cursor-pointer"}
+          `}
+          />
+          <div
+            className={`
+            relative h-5.5 w-5.5 rounded-full border flex flex-col items-center justify-center
+            transition-all duration-300 ease-in-out
+            ${
+              disabled
+                ? "bg-gray-100 border-gray-300"
+                : `bg-white border-gray-300 group-hover:border-gray-400
+              ${
+                checked
+                  ? "!border-none bg-gradient-to-br !from-black/70 via-red-900/90 !to-red-900/20"
+                  : ""
+              }`
+            }`}
+          >
+            <svg
+              className={`
+              h-3 w-3 text-white transition-all duration-200
+              ${checked ? "scale-100 opacity-100" : "scale-75 opacity-0"}
+            `}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="3"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          </div>
+        </section>
+        <section className="flex flex-col">
           {label}
           {description && (
             <p
@@ -103,8 +94,8 @@ export default function CustomCheckbox({
               {description}
             </p>
           )}
-        </label>
-      </div>
+        </section>
+      </label>
 
       {!disabled && (
         <span

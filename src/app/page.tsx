@@ -86,7 +86,7 @@ export default function Chat() {
     if (promptOptions.cot) {
       enhanced +=
         " " +
-        "Reason step-by-step (Chain of thought) and take pauses before answering.";
+        "Reason step-by-step (Chain of thought) and explain your reason as you go.";
     }
     return enhanced;
   }, [input, promptOptions, enhanceText]);
@@ -110,7 +110,7 @@ export default function Chat() {
   };
 
   return (
-    <div className="flex flex-col justify-between items-center min-h-[97vh] w-full max-w-3xl mx-auto">
+    <div className="flex flex-col justify-between items-center min-h-[95vh] w-full max-w-3xl mx-auto">
       <PromptEnhancer
         enhanceText={enhanceText}
         setEnhanceText={setEnhanceText}
@@ -134,7 +134,7 @@ export default function Chat() {
         <PromptEngineeringAdvice />
         <PromptGuide />
       </div>
-      <section className="flex flex-col pt-2 h-full lg:max-h-[85vh] overflow-scroll w-full">
+      <section className="flex flex-col pt-2 h-full lg:max-h-[85vh] overflow-y-scroll w-full">
         {messages.length < 1 ? (
           <p className="font-semibold text-black/70 text-center mt-14">
             Send a message to initiate the chat

@@ -6,7 +6,6 @@ export async function POST(req: Request) {
   /* const { messages } = await req.json(); */
   try {
     const data = await req.json();
-    console.log(data);
     const { prompt, response, usage, options } = data;
     if (!prompt || !response) {
       return new Response(
@@ -17,7 +16,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const systemInstruction = `
+    /*  const systemInstruction = `
     You are an expert AI grader. Evaluate the assistant's response to a user's prompt.
     Rate the response on accuracy, aesthetics, correctness, relevance, completeness, and tone.
     Return your evaluation in the following strict JSON format:
@@ -31,7 +30,51 @@ export async function POST(req: Request) {
       "usage": ${JSON.stringify(usage)},
       "options": ${JSON.stringify(options)},
     }
-    `;
+    `; */
+    const systemInstruction = `
+You are an expert AI grader evaluating an assistant's response to a user's prompt.
+
+Your goal is to rate the quality of the response using a holistic but clearly defined rubric, and to provide detailed, structured feedback.
+
+Evaluate the assistant's response across the following six criteria:
+
+1. **Accuracy** - Is the information factually correct?
+2. **Correctness** - Does it logically answer the user's prompt or question?
+3. **Relevance** - Does it stay on topic and directly address the prompt?
+4. **Completeness** - Are all important aspects of the user's prompt addressed?
+5. **Aesthetics** - Is the language clear, well-formatted, and readable?
+6. **Tone** - Is the tone appropriate, respectful, and helpful?
+
+For each criterion, give a **score from 1 to 10**, where:
+- 1 = Very poor
+- 5 = Acceptable
+- 10 = Excellent
+
+The overall **score** (1-100) should reflect the general quality of the response and should not just be an average. Instead, it should:
+- Heavily penalize failures in Accuracy, Correctness, or Relevance.
+- Reward clarity, helpful tone, and thoroughness.
+- Reflect real-world usefulness and trustworthiness.
+
+Then, provide a detailed explanation of the assistant's strengths and weaknesses, and suggestions for improvement.
+
+Respond ONLY with valid, parsable JSON in the following format:
+
+{
+  "prompt": ${JSON.stringify(prompt)},
+  "response": ${JSON.stringify(response)},
+  "criteria_scores": {
+    "accuracy": <1-10>,
+    "correctness": <1-10>,
+    "relevance": <1-10>,
+    "completeness": <1-10>,
+    "aesthetics": <1-10>,
+    "tone": <1-10>
+  },
+  "score": <1-100>,
+  "feedback": "<Detailed explanation of the evaluation, including both strengths and areas for improvement.>"
+}
+`;
+
     const result = await generateText({
       model: openai("o4-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini
       temperature: 0.5,
@@ -69,11 +112,12 @@ export async function POST(req: Request) {
       {
         prompt: parsed.prompt,
         response: parsed.response,
+        options: options,
+        criteria_scores: parsed.criteria_scores,
         score: parsed.score,
+        usage: usage,
         feedback: parsed.feedback,
-        usage: parsed.usage,
-        options: parsed.options,
-      },
+      } as EvaluationData,
     ]);
 
     if (error) {

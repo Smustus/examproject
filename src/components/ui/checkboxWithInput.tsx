@@ -102,22 +102,13 @@ export default function CheckboxWithInput({
 }: CheckboxWithInputProps) {
   return (
     <div className="mb-4">
-      <label className="flex items-center select-none">
-        {/* <div className="relative"> */}
-        {/* <input
-            type="checkbox"
-            name={name}
-            checked={checked}
-            onChange={onCheckboxChange}
-            className="appearance-none h-5 w-5 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-          /> */}
+      <section className="flex items-center select-none">
         <CustomCheckbox
           name={name}
           checked={checked}
           onChange={onCheckboxChange}
           label={label}
         />
-
         {checked && (
           <svg
             className="absolute left-0 top-0 mt-1 ml-1 h-3 w-3 text-white pointer-events-none"
@@ -131,10 +122,8 @@ export default function CheckboxWithInput({
             <polyline points="20 6 9 17 4 12"></polyline>
           </svg>
         )}
-        {/* </div> */}
-        {/*      <span className="text-gray-700">{label}</span> */}
-      </label>
-      <div
+      </section>
+      <section
         className={`transition-all duration-400 ease-out overflow-hidden transform ${
           checked
             ? "max-h-40 opacity-100 translate-y-0"
@@ -162,7 +151,7 @@ export default function CheckboxWithInput({
             onChange={onInputChange}
           />
         )}
-      </div>
+      </section>
     </div>
   );
 }

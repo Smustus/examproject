@@ -24,12 +24,33 @@ type EnhanceTextProps = {
   options: EnhanceOptionsType;
 };
 
-type Evaluation = {
-  id: string;
+type EvaluationData = {
   prompt: string;
   response: string;
-  score: number;
-  feedback: string;
   options: object;
-  created_at: string;
+  criteria_scores: CriteriaScore;
+  score: number;
+  usage: object;
+  feedback: string;
 };
+
+type CriteriaScore = {
+  accuracy: number;
+  correctness: number;
+  relevance: number;
+  completeness: number;
+  aesthetics: number;
+  tone: number;
+};
+
+/* type Evaluation = {
+  id: string;
+  created_at: string;
+  prompt: string;
+  response: string;
+  options: object;
+  criteria_scores: CriteriaScore;
+  score: number;
+  usage: object;
+  feedback: string;
+}; */
