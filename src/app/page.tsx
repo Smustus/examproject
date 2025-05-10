@@ -34,6 +34,10 @@ export default function Chat() {
     examples: false,
     constraints: false,
     cot: false,
+    targetAudience: false,
+    desiredLength: false,
+    explicitThinking: false,
+    generateKnowledge: false,
   });
   const [enhanceText, setEnhanceText] = useState<EnhanceTextType>({
     context: "",
@@ -41,6 +45,8 @@ export default function Chat() {
     formatInstructions: "",
     exampleInstructions: "",
     constraintsText: "",
+    targetAudienceDescription: "",
+    desiredLengthHint: "",
   });
 
   const [showGuide, setShowGuide] = useState(false);
@@ -54,40 +60,79 @@ export default function Chat() {
 
   const enhancedPrompt = useMemo(() => {
     let enhanced = input;
-    if (promptOptions.defineRole) {
-      enhanced =
-        `You are ${
-          enhanceText.roleDescription ||
-          "an expert in this field with 10+ years of experience"
-        }. ` + enhanced;
-    }
-    if (promptOptions.provideContext) {
-      enhanced += enhanceText.context;
+    const instructionParts: string[] = [];
+
+    if (promptOptions.defineRole && enhanceText.roleDescription) {
+      instructionParts.push(`You are ${enhanceText.roleDescription}.`);
+    } else if (promptOptions.defineRole) {
+      instructionParts.push(
+        `Act as an expert in this field with 10+ years of experience.`
+      );
     }
 
-    if (promptOptions.setFormat) {
-      enhanced +=
-        " " +
-        (enhanceText.formatInstructions ||
-          "Format your response with clear headings, bullet points, and numbered steps where appropriate.");
+    if (promptOptions.targetAudience && enhanceText.targetAudienceDescription) {
+      instructionParts.push(
+        `Tailor the response for ${enhanceText.targetAudienceDescription}.`
+      );
+    } else if (promptOptions.targetAudience) {
+      instructionParts.push(`Tailor the response for a general audience.`);
     }
-    if (promptOptions.examples) {
-      enhanced +=
-        " " +
-        (enhanceText.exampleInstructions ||
-          "Provide a relevant example to illustrate your points.");
+
+    if (promptOptions.provideContext && enhanceText.context) {
+      instructionParts.push(`Additional context: ${enhanceText.context}`);
     }
-    if (promptOptions.constraints) {
-      enhanced +=
-        " " +
-        (enhanceText.constraintsText ||
-          "Include only verified information from reliable sources.");
+
+    if (promptOptions.setFormat && enhanceText.formatInstructions) {
+      instructionParts.push(
+        `Format your response as follows: ${enhanceText.formatInstructions}`
+      );
+    } else if (promptOptions.setFormat) {
+      instructionParts.push(
+        `Format your response with clear headings, bullet points, and numbered steps where appropriate.`
+      );
     }
+
+    if (promptOptions.examples && enhanceText.exampleInstructions) {
+      instructionParts.push(
+        `Here are examples: ${enhanceText.exampleInstructions}`
+      );
+    }
+    if (promptOptions.constraints && enhanceText.constraintsText) {
+      instructionParts.push(
+        `Adhere to these constraints: ${enhanceText.constraintsText}`
+      );
+    } else if (promptOptions.constraints) {
+      instructionParts.push(
+        `Adhere to these constraints: Include only verified information from reliable sources.`
+      );
+    }
+
     if (promptOptions.cot) {
+      instructionParts.push(
+        "Think step-by-step (Chain of thought) while reasoning."
+      );
+    }
+
+    if (promptOptions.desiredLength && enhanceText.desiredLengthHint) {
+      instructionParts.push(
+        `The desired output length is ${enhanceText.desiredLengthHint}.`
+      );
+    }
+
+    if (promptOptions.explicitThinking) {
+      instructionParts.push(
+        `Before providing the final answer, internally think step-by-step to analyze the problem.`
+      );
+    }
+    if (promptOptions.generateKnowledge) {
       enhanced +=
         " " +
-        "Reason step-by-step (Chain of thought) and explain your reason as you go.";
+        "First, generate and list relevant facts about the topic before providing the final response.";
     }
+    if (instructionParts.length > 0) {
+      enhanced = instructionParts.join("\n") + "\n\n" + enhanced;
+    }
+
     return enhanced;
   }, [input, promptOptions, enhanceText]);
 
@@ -177,14 +222,12 @@ export default function Chat() {
             Tip: Use the prompt enhancer to improve your prompt. For complex
             queries, combine multiple options.
           </p>
-          {/* <PromptEnhancer
-            enhanceText={enhanceText}
-            setEnhanceText={setEnhanceText}
-            setShowEnhancePrompt={setShowEnhancePrompt}
-            showEnhancePrompt={showEnhancePrompt}
-            setPromptOptions={setPromptOptions}
-            promptOptions={promptOptions}
-          /> */}
+          <Button
+            onClick={() => setShowEnhancePrompt(!showEnhancePrompt)}
+            className={` ${showEnhancePrompt ? "" : ""}`}
+          >
+            {showEnhancePrompt ? "Hide" : "Prompt Enhancer"}
+          </Button>
         </form>
       </section>
     </div>

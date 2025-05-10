@@ -1,4 +1,4 @@
-type EnhanceTextType = {
+type EnhanceTextType2 = {
   context: string;
   roleDescription: string;
   formatInstructions: string;
@@ -6,13 +6,38 @@ type EnhanceTextType = {
   constraintsText: string;
 };
 
-type EnhanceOptionsType = {
+type EnhanceOptionsType2 = {
   defineRole: boolean;
   provideContext: boolean;
   setFormat: boolean;
   examples: boolean;
   constraints: boolean;
   cot: boolean;
+};
+
+type EnhanceOptionsType = {
+  defineRole: boolean;
+  targetAudience: boolean; // New
+  provideContext: boolean;
+  setFormat: boolean;
+  examples: boolean;
+  constraints: boolean;
+  desiredLength: boolean; // New
+  explicitThinking: boolean; // New
+  generateKnowledge: boolean; // New
+  cot: boolean;
+  // ... other options you might add
+};
+
+type EnhanceTextType = {
+  roleDescription: string;
+  targetAudienceDescription: string; // New
+  context: string;
+  formatInstructions: string;
+  exampleInstructions: string;
+  constraintsText: string;
+  desiredLengthHint: string; // New
+  // explicitThinking and generateKnowledge might not need text fields if just adding a fixed instruction
 };
 
 type EnhanceTextProps = {

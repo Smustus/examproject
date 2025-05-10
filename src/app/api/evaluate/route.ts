@@ -16,21 +16,6 @@ export async function POST(req: Request) {
       );
     }
 
-    /*  const systemInstruction = `
-    You are an expert AI grader. Evaluate the assistant's response to a user's prompt.
-    Rate the response on accuracy, aesthetics, correctness, relevance, completeness, and tone.
-    Return your evaluation in the following strict JSON format:
-    The score system should reflect the interval from 1 = the response did not adress the prompt at all to 100 = the response was comprehensive, understandable and fully accurate.
-    
-    {
-      "prompt": ${JSON.stringify(prompt)},
-      "response": ${JSON.stringify(response)},
-      "score": 1-100,
-      "feedback": "<detailed explanation>",
-      "usage": ${JSON.stringify(usage)},
-      "options": ${JSON.stringify(options)},
-    }
-    `; */
     const systemInstruction = `
 You are an expert AI grader evaluating an assistant's response to a user's prompt.
 
@@ -76,10 +61,26 @@ Respond ONLY with valid, parsable JSON in the following format:
 `;
 
     const result = await generateText({
-      model: openai("o4-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini
+      model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini gtp-4.1
       temperature: 0.5,
       topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered
-      topK: 20, //Only sample from the top K options for each subsequent token.
+      topK: 50, //Only sample from the top K options for each subsequent token.
+      tools: {
+        webSearch: {
+          description: "Search the web for recent information.",
+          parameters: {
+            type: "object",
+            properties: {
+              query: { type: "string", description: "Search query to look up" },
+            },
+            required: ["query"],
+          },
+          execute: async ({ query }) => {
+            const result = await webSearch(query);
+            return { result };
+          },
+        },
+      },
       messages: [
         {
           role: "user",
