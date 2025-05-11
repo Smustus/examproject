@@ -17,70 +17,54 @@ export async function POST(req: Request) {
     }
 
     const systemInstruction = `
-You are an expert AI grader evaluating an assistant's response to a user's prompt.
+      You are an expert AI grader evaluating an assistant's response to a user's prompt.
 
-Your goal is to rate the quality of the response using a holistic but clearly defined rubric, and to provide detailed, structured feedback.
+      Your goal is to rate the quality of the response using a holistic but clearly defined rubric, and to provide detailed, structured feedback.
 
-Evaluate the assistant's response across the following six criteria:
+      Evaluate the assistant's response across the following six criteria:
 
-1. **Accuracy** - Is the information factually correct?
-2. **Correctness** - Does it logically answer the user's prompt or question?
-3. **Relevance** - Does it stay on topic and directly address the prompt?
-4. **Completeness** - Are all important aspects of the user's prompt addressed?
-5. **Aesthetics** - Is the language clear, well-formatted, and readable?
-6. **Tone** - Is the tone appropriate, respectful, and helpful?
+      1. **Accuracy** - Is the information factually correct?
+      2. **Correctness** - Does it logically answer the user's prompt or question?
+      3. **Relevance** - Does it stay on topic and directly address the prompt?
+      4. **Completeness** - Are all important aspects of the user's prompt addressed?
+      5. **Aesthetics** - Is the language clear, well-formatted, and readable?
+      6. **Tone** - Is the tone appropriate, respectful, and helpful?
 
-For each criterion, give a **score from 1 to 10**, where:
-- 1 = Very poor
-- 5 = Acceptable
-- 10 = Excellent
+      For each criterion, give a **score from 1 to 10**, where:
+      - 1 = Very poor
+      - 5 = Acceptable
+      - 10 = Excellent
 
-The overall **score** (1-100) should reflect the general quality of the response and should not just be an average. Instead, it should:
-- Heavily penalize failures in Accuracy, Correctness, or Relevance.
-- Reward clarity, helpful tone, and thoroughness.
-- Reflect real-world usefulness and trustworthiness.
+      The overall **score** (1-100) should reflect the general quality of the response and should not just be an average. Instead, it should:
+      - Heavily penalize failures in Accuracy, Correctness, or Relevance.
+      - Reward clarity, helpful tone, and thoroughness.
+      - Reflect real-world usefulness and trustworthiness.
 
-Then, provide a detailed explanation of the assistant's strengths and weaknesses, and suggestions for improvement.
+      Then, provide a detailed explanation of the assistant's strengths and weaknesses, and suggestions for improvement.
 
-Respond ONLY with valid, parsable JSON in the following format:
+      Respond ONLY with valid, parsable JSON in the following format:
 
-{
-  "prompt": ${JSON.stringify(prompt)},
-  "response": ${JSON.stringify(response)},
-  "criteria_scores": {
-    "accuracy": <1-10>,
-    "correctness": <1-10>,
-    "relevance": <1-10>,
-    "completeness": <1-10>,
-    "aesthetics": <1-10>,
-    "tone": <1-10>
-  },
-  "score": <1-100>,
-  "feedback": "<Detailed explanation of the evaluation, including both strengths and areas for improvement.>"
-}
-`;
+      {
+        "prompt": ${JSON.stringify(prompt)},
+        "response": ${JSON.stringify(response)},
+        "criteria_scores": {
+          "accuracy": <1-10>,
+          "correctness": <1-10>,
+          "relevance": <1-10>,
+          "completeness": <1-10>,
+          "aesthetics": <1-10>,
+          "tone": <1-10>
+        },
+        "score": <1-100>,
+        "feedback": "<Detailed explanation of the evaluation, including both strengths and areas for improvement.>"
+      }
+    `;
 
     const result = await generateText({
       model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini gtp-4.1
       temperature: 0.5,
       topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered
       topK: 50, //Only sample from the top K options for each subsequent token.
-      tools: {
-        webSearch: {
-          description: "Search the web for recent information.",
-          parameters: {
-            type: "object",
-            properties: {
-              query: { type: "string", description: "Search query to look up" },
-            },
-            required: ["query"],
-          },
-          execute: async ({ query }) => {
-            const result = await webSearch(query);
-            return { result };
-          },
-        },
-      },
       messages: [
         {
           role: "user",
