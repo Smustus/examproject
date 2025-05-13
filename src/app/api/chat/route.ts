@@ -9,7 +9,6 @@ export async function POST(req: Request) {
   const data = await req.json();
   console.log(data);
   console.log(data.finalPrompt);
-  const messages = data.messages;
 
   const systemInstruction = `You are a helpful assistant. You listen carefully to instructions. You can answer questions and provide information on a wide range of topics. Your answers should be clear, concise, and well-structured using proper Markdown syntax.
     Guidelines:
