@@ -1,4 +1,4 @@
-"use client";
+/* "use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
@@ -90,6 +90,215 @@ export default function DashboardClient() {
           </tbody>
         </table>
       </div>
+    </div>
+  );
+}
+ */
+
+"use client";
+
+import { useEffect, useState } from "react";
+import { supabase } from "@/utils/supabase";
+import { Comparison } from "@/lib/types";
+
+// Define the type based on the 'comparisons' table structure
+// Using 'any' for JSONB fields for simplicity in this example,
+// but ideally, you'd define types for EvaluationResult, Usage, Options, and Feedback JSON structures.
+
+export default function DashboardClient() {
+  const [comparisons, setComparisons] = useState<Comparison[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchComparisons = async () => {
+    const { data, error } = await supabase
+      .from("comparisons")
+      .select("*") // Select all columns based on the new type
+      .order("created_at", { ascending: false }); // Order by creation time
+
+    if (error) {
+      console.error("Error fetching comparisons:", error);
+      setError(error.message);
+    } else {
+      setComparisons(data || []); // Set the fetched data
+    }
+  };
+
+  useEffect(() => {
+    fetchComparisons(); // Fetch data initially
+
+    // === Change table name for realtime updates ===
+    // Use a unique channel name, maybe related to the table
+    const channel = supabase
+      .channel("realtime-comparisons")
+      .on(
+        "postgres_changes",
+        {
+          event: "*", // Listen for all events (INSERT, UPDATE, DELETE)
+          schema: "public",
+          table: "comparisons", // === Change table name ===
+        },
+        (payload) => {
+          console.log("Realtime comparison update:", payload);
+          // Re-fetch all data to update the list
+          fetchComparisons();
+        }
+      )
+      .subscribe(); // Subscribe to the channel
+
+    // Cleanup function to unsubscribe when the component unmounts
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []); // Empty dependency array means this effect runs only once on mount
+
+  if (error)
+    return (
+      <div className="p-6 text-red-600">Error loading comparisons: {error}</div>
+    );
+
+  return (
+    <div className="p-6 min-h-screen">
+      <h1 className="text-2xl font-bold mb-4 text-gray-800">
+        Prompt Comparison Dashboard
+      </h1>
+      <div className="overflow-x-auto shadow-md rounded-lg">
+        <table className="min-w-full bg-white border-collapse">
+          <thead>
+            <tr className="bg-gray-200 text-gray-700 uppercase text-xs leading-normal">
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Created
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Original Prompt
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Base Response
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Enhanced Response
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Base Score
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Enhanced Score
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Options Used
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Base Token Usage
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Enhanced Token Usage
+              </th>
+              <th className="py-2 px-6 text-left border-b border-gray-200">
+                Feedback
+              </th>
+            </tr>
+          </thead>
+          <tbody className="text-gray-600 text-sm">
+            {comparisons.map((comparison, index) => (
+              <tr
+                key={comparison.id}
+                className={`border-b border-gray-200 ${
+                  index % 2 ? "bg-gray-50" : "bg-white"
+                }`}
+              >
+                <td className="py-2 px-6 text-left whitespace-nowrap">
+                  {new Date(comparison.created_at).toLocaleString()}
+                </td>
+
+                <td
+                  className="py-2 px-6 text-left max-w-xs truncate"
+                  title={comparison.prompt || ""}
+                >
+                  {comparison.prompt}
+                </td>
+
+                <td
+                  className="py-2 px-6 text-left max-w-xs truncate"
+                  title={comparison.response_base_prompt || ""}
+                >
+                  {comparison.response_base_prompt}
+                </td>
+
+                <td
+                  className="py-2 px-6 text-left max-w-xs truncate"
+                  title={comparison.response_enhanced_prompt || ""}
+                >
+                  {comparison.response_enhanced_prompt}
+                </td>
+
+                <td className="py-2 px-6 text-left ">
+                  {comparison.evaluation_base_prompt?.score != null
+                    ? (
+                        comparison.evaluation_base_prompt.score as number
+                      ).toFixed(2)
+                    : "N/A"}{" "}
+                </td>
+                <td className="py-2 px-6 text-left">
+                  {comparison.evaluation_enhanced_prompt?.score != null
+                    ? (
+                        comparison.evaluation_enhanced_prompt.score as number
+                      ).toFixed(2)
+                    : "N/A"}
+                </td>
+
+                <td className="py-2 px-6 text-left max-w-xs">
+                  {comparison.options
+                    ? // Filter for options that are true and join the keys
+                      Object.entries(comparison.options)
+                        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                        .filter(([key, value]) => value === true)
+                        .map(([key]) => key) // Get the key name
+                        .join(", ") || "None" // Join with comma, display 'None' if no options are true
+                    : "N/A"}{" "}
+                </td>
+                {/* Optional: Display usage or feedback JSONB (might need more complex rendering) */}
+                <td
+                  className="py-2 px-6 text-left max-w-xs truncate"
+                  title={JSON.stringify(comparison.base_prompt_usage)}
+                >
+                  {/* {`Prompt:
+                  ${JSON.stringify(comparison.base_prompt_usage.promptTokens)},
+                  Response: ${JSON.stringify(
+                    comparison.base_prompt_usage.completionTokens
+                  )}`} */}
+                  {`${JSON.stringify(
+                    comparison.base_prompt_usage.totalTokens
+                  )}`}
+                </td>
+                <td
+                  className="py-2 px-6 text-left max-w-xs"
+                  title={JSON.stringify(comparison.enhanced_prompt_usage)}
+                >
+                  {/* {`Prompt: ${JSON.stringify(
+                    comparison.enhanced_prompt_usage.promptTokens
+                  )},
+                  Response: ${JSON.stringify(
+                    comparison.enhanced_prompt_usage.completionTokens
+                  )}`} */}
+                  {`${JSON.stringify(
+                    comparison.enhanced_prompt_usage.totalTokens
+                  )}`}
+                </td>
+                <td
+                  className="py-2 px-6 text-left max-w-xs truncate"
+                  title={comparison.feedback!}
+                >
+                  {comparison.feedback}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      {comparisons.length === 0 && !error && (
+        <p className="text-center text-gray-500 mt-8">
+          No comparison data available yet.
+        </p>
+      )}
     </div>
   );
 }

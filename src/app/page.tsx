@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import PromptEnhancer from "@/components/promptEnhancer";
 import PromptGuide from "@/components/promptOrderGuide";
 import PromptEngineeringAdvice from "@/components/promptEngineeringAdvice";
-import { evaluateResponse } from "@/utils/evaluateResponse";
+import { compareResponses } from "@/utils/evaluateResponse";
 import ChatMessage from "@/components/chatMessage";
+import { EnhanceTextType } from "@/lib/types";
 
 export default function Chat() {
   const {
@@ -17,13 +18,24 @@ export default function Chat() {
     handleSubmit: originalSubmit,
   } = useChat({
     onFinish: async (message, options) => {
-      const evaluationPrompt = {
+      /* const evaluationPrompt = {
         prompt: enhancedPrompt,
         response: message.content,
         usage: options.usage,
         options: promptOptions,
+      }; */
+      console.log(options.usage);
+      console.log(basePrompt);
+
+      const comparePrompt = {
+        basePrompt: basePrompt,
+        enhancedPrompt: enhancedPrompt,
+        enhancedPromptResponse: message.content,
+        enhancedPromptUsage: options.usage,
+        options: promptOptions,
       };
-      await evaluateResponse(evaluationPrompt);
+      /* await evaluateResponse(evaluationPrompt); */
+      await compareResponses(comparePrompt);
     },
   });
 
@@ -48,6 +60,7 @@ export default function Chat() {
     targetAudienceDescription: "",
     desiredLengthHint: "",
   });
+  const [basePrompt, setBasePrompt] = useState<string>("");
 
   const [showGuide, setShowGuide] = useState(false);
   const [showEnhancePrompt, setShowEnhancePrompt] = useState(false);
@@ -79,12 +92,12 @@ export default function Chat() {
     }
 
     if (promptOptions.provideContext && enhanceText.context) {
-      instructionParts.push(`Additional context: ${enhanceText.context}`);
+      instructionParts.push(`Additional context: ${enhanceText.context}.`);
     }
 
     if (promptOptions.setFormat && enhanceText.formatInstructions) {
       instructionParts.push(
-        `Format your response as follows: ${enhanceText.formatInstructions}`
+        `Format your response as follows: ${enhanceText.formatInstructions}.`
       );
     } else if (promptOptions.setFormat) {
       instructionParts.push(
@@ -94,12 +107,12 @@ export default function Chat() {
 
     if (promptOptions.examples && enhanceText.exampleInstructions) {
       instructionParts.push(
-        `Here are examples: ${enhanceText.exampleInstructions}`
+        `Here are examples: ${enhanceText.exampleInstructions}.`
       );
     }
     if (promptOptions.constraints && enhanceText.constraintsText) {
       instructionParts.push(
-        `Adhere to these constraints: ${enhanceText.constraintsText}`
+        `Adhere to these constraints: ${enhanceText.constraintsText}.`
       );
     } else if (promptOptions.constraints) {
       instructionParts.push(
@@ -125,12 +138,12 @@ export default function Chat() {
       );
     }
     if (promptOptions.generateKnowledge) {
-      enhanced +=
-        " " +
-        "First, generate and list relevant facts about the topic before providing the final response.";
+      instructionParts.push(
+        `First, generate and list relevant facts about the topic before providing the final response.`
+      );
     }
     if (instructionParts.length > 0) {
-      enhanced = instructionParts.join("\n") + "\n\n" + enhanced;
+      enhanced = instructionParts.join("\n") + "\n" + enhanced;
     }
 
     return enhanced;
@@ -208,7 +221,10 @@ export default function Chat() {
               className="group outline-none px-3 w-full py-4 text-black/90"
               value={input}
               placeholder="Type your message here..."
-              onChange={handleInputChange}
+              onChange={(e) => {
+                handleInputChange(e);
+                setBasePrompt(e.target.value);
+              }}
             />
             <Button
               type="submit"

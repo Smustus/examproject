@@ -68,6 +68,31 @@ type CriteriaScore = {
   tone: number;
 };
 
+export type EvaluationResult = {
+  criteria_scores: CriteriaScore;
+  score: number;
+};
+
+type Comparison = {
+  id: string;
+  created_at: string;
+  prompt: string;
+  response_base_prompt: string;
+  response_enhanced_prompt: string;
+  base_prompt_usage: Usage;
+  evaluation_base_prompt: EvaluationResult;
+  evaluation_enhanced_prompt: EvaluationResult;
+  enhanced_prompt_usage: Usage;
+  feedback: string;
+  options: EnhanceOptionsType;
+};
+
+type Usage = {
+  promptTokens: number;
+  completionTokens: number;
+  totalTokens: number;
+};
+
 /* type Evaluation = {
   id: string;
   created_at: string;

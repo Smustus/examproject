@@ -8,16 +8,10 @@ export async function POST(req: Request) {
   /* const { messages } = await req.json(); */
   const data = await req.json();
   console.log(data);
+  console.log(data.finalPrompt);
   const messages = data.messages;
 
-  const result = streamText({
-    model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini gpt-4.1-nano
-    temperature: 0.5,
-    topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered
-    topK: 20, //Only sample from the top K options for each subsequent token.
-    /* messages, */
-    messages: data.clearHistory ? [messages[messages.length - 1]] : messages,
-    system: `You are a helpful assistant. You can answer questions and provide information on a wide range of topics. Your answers should be clear, concise, and well-structured using proper Markdown syntax.
+  const systemInstruction = `You are a helpful assistant. You listen carefully to instructions. You can answer questions and provide information on a wide range of topics. Your answers should be clear, concise, and well-structured using proper Markdown syntax.
     Guidelines:
     - Use **bold** for emphasis
     - Use *italics* for subtle emphasis
@@ -27,7 +21,17 @@ export async function POST(req: Request) {
     - Format code using \`\`inline code\`\` or code blocks with triple backticks
 
     Do not use any HTML.  Just Markdown.
-    All responses must follow these formatting rules consistently.`,
+    All responses must follow these formatting rules consistently.`;
+
+  const result = streamText({
+    model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini gpt-4.1-nano
+    temperature: 0.8,
+    /* topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered */
+    topK: 40, //Only sample from the top K options for each subsequent token.
+    /* messages, */
+    /* messages: data.clearHistory ? data.finalPrompt : messages, */
+    prompt: data.finalPrompt,
+    system: systemInstruction,
   });
 
   return result.toDataStreamResponse();

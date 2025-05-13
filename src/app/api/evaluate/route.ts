@@ -17,7 +17,7 @@ export async function POST(req: Request) {
     }
 
     const systemInstruction = `
-      You are an expert AI grader evaluating an assistant's response to a user's prompt.
+      You are an expert AI critic, evaluating an assistant's response to a user's prompt.
 
       Your goal is to rate the quality of the response using a holistic but clearly defined rubric, and to provide detailed, structured feedback.
 
