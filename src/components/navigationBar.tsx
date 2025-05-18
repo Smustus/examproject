@@ -11,6 +11,9 @@ const NavigationBar = () => {
       <Link href={"/dashboard"} className={`${commonClasses}`}>
         Dashboard
       </Link>
+      <Link href={"/charts"} className={`${commonClasses}`}>
+        Charts
+      </Link>
     </nav>
   );
 };

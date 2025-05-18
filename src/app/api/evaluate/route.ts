@@ -1,4 +1,3 @@
-import { EvaluationData } from "@/lib/types";
 import { supabase } from "@/utils/supabase";
 import { openai } from "@ai-sdk/openai";
 import { generateText } from "ai";

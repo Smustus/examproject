@@ -2,7 +2,6 @@ import React from "react";
 import CheckboxWithInput from "./ui/checkboxWithInput";
 import { Button } from "./ui/button";
 import CustomCheckbox from "./ui/checkbox";
-import { EnhanceTextType, EnhanceOptionsType } from "@/lib/types";
 
 // Define this array either inside PromptEnhancer or import it
 const promptEnhancementOptionsConfig = [
@@ -119,14 +118,17 @@ const PromptEnhancer = ({
 }) => {
   const handleOptionChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
-    setPromptOptions((prev) => ({ ...prev, [name]: checked }));
+    setPromptOptions((prev: EnhanceOptionsType) => ({
+      ...prev,
+      [name]: checked,
+    }));
   };
 
   // Centralized input handler (as suggested before)
   const handleTextInputChange =
     (key: keyof EnhanceTextType) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setEnhanceText((prev) => ({
+      setEnhanceText((prev: EnhanceTextType) => ({
         ...prev,
         [key]: e.target.value,
       }));

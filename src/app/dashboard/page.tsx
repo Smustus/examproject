@@ -99,11 +99,6 @@ export default function DashboardClient() {
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/utils/supabase";
-import { Comparison } from "@/lib/types";
-
-// Define the type based on the 'comparisons' table structure
-// Using 'any' for JSONB fields for simplicity in this example,
-// but ideally, you'd define types for EvaluationResult, Usage, Options, and Feedback JSON structures.
 
 export default function DashboardClient() {
   const [comparisons, setComparisons] = useState<Comparison[]>([]);
@@ -119,14 +114,13 @@ export default function DashboardClient() {
       console.error("Error fetching comparisons:", error);
       setError(error.message);
     } else {
-      setComparisons(data || []); // Set the fetched data
+      setComparisons(data || []);
     }
   };
 
   useEffect(() => {
-    fetchComparisons(); // Fetch data initially
+    fetchComparisons();
 
-    // === Change table name for realtime updates ===
     // Use a unique channel name, maybe related to the table
     const channel = supabase
       .channel("realtime-comparisons")
@@ -149,7 +143,7 @@ export default function DashboardClient() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, []); // Empty dependency array means this effect runs only once on mount
+  }, []);
 
   if (error)
     return (

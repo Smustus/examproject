@@ -8,7 +8,6 @@ export async function POST(req: Request) {
   /* const { messages } = await req.json(); */
   const data = await req.json();
   console.log(data);
-  console.log(data.finalPrompt);
 
   const systemInstruction = `You are a helpful assistant. You listen carefully to instructions. You can answer questions and provide information on a wide range of topics. Your answers should be clear, concise, and well-structured using proper Markdown syntax.
     Guidelines:
@@ -24,7 +23,7 @@ export async function POST(req: Request) {
 
   const result = streamText({
     model: openai("gpt-4o-mini"), //o3-mini gpt-4o gpt-4o-mini o4-mini gpt-4.1-mini gpt-4.1-nano
-    temperature: 0.8,
+    temperature: 0.5,
     /* topP: 0.1, //0.1 would mean that only tokens with the top 10% probability mass are considered */
     topK: 40, //Only sample from the top K options for each subsequent token.
     /* messages, */

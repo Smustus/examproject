@@ -8,7 +8,6 @@ import PromptGuide from "@/components/promptOrderGuide";
 import PromptEngineeringAdvice from "@/components/promptEngineeringAdvice";
 import { compareResponses } from "@/utils/evaluateResponse";
 import ChatMessage from "@/components/chatMessage";
-import { EnhanceTextType } from "@/lib/types";
 
 export default function Chat() {
   const {
@@ -217,7 +216,8 @@ export default function Chat() {
           )}
 
           <div className=" flex items-center justify-between space-x-2 flex-1 border border-gray-300 rounded-xl bg-gray-100 overflow-hidden focus-within:bg-white duration-200">
-            <input
+            <textarea
+              rows={2}
               className="group outline-none px-3 w-full py-4 text-black/90"
               value={input}
               placeholder="Type your message here..."
