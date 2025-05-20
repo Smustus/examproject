@@ -26,7 +26,6 @@ type EnhanceOptionsType = {
   explicitThinking: boolean; // New
   generateKnowledge: boolean; // New
   cot: boolean;
-  // ... other options you might add
 };
 
 type EnhanceTextType = {
@@ -37,7 +36,6 @@ type EnhanceTextType = {
   exampleInstructions: string;
   constraintsText: string;
   desiredLengthHint: string; // New
-  // explicitThinking and generateKnowledge might not need text fields if just adding a fixed instruction
 };
 
 type EnhanceTextProps = {
@@ -68,7 +66,7 @@ type CriteriaScore = {
   tone: number;
 };
 
-export type EvaluationResult = {
+type EvaluationResult = {
   criteria_scores: CriteriaScore;
   score: number;
 };
@@ -93,7 +91,7 @@ type Usage = {
   totalTokens: number;
 };
 
-/* type Evaluation = {
+type Evaluation = {
   id: string;
   created_at: string;
   prompt: string;
@@ -103,4 +101,4 @@ type Usage = {
   score: number;
   usage: object;
   feedback: string;
-}; */
+};

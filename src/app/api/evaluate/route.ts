@@ -102,7 +102,7 @@ export async function POST(req: Request) {
         score: parsed.score,
         usage: usage,
         feedback: parsed.feedback,
-      } as EvaluationData,
+      },
     ]);
 
     if (error) {

@@ -12,7 +12,7 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts";
 const chartConfig = {
   diff: {
     label: "Diff",
-    color: "#1f1f1f",
+    color: "#000000",
   },
 } satisfies ChartConfig;
 
@@ -29,8 +29,7 @@ const Chart = ({ chartData }: { chartData: any }) => {
       frequency,
     }));
   };
-  /*   console.log(calcFrequency(chartData)) */ const chartData2 =
-    calcFrequency(chartData);
+  const chartData2 = calcFrequency(chartData);
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
@@ -43,7 +42,7 @@ const Chart = ({ chartData }: { chartData: any }) => {
           axisLine={false}
           /* tickFormatter={(value) => value.slice(0, 3)} */
         />
-        <YAxis tickLine={false} axisLine={false} />
+        <YAxis tickLine={false} axisLine={false} tickMargin={10} />
         <ChartTooltip content={<ChartTooltipContent />} />
         <ChartLegend content={<ChartLegendContent nameKey="diff" />} />
         <Bar dataKey="frequency" fill="var(--color-value)" radius={4} />

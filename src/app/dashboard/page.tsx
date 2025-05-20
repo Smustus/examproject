@@ -103,8 +103,10 @@ import { supabase } from "@/utils/supabase";
 export default function DashboardClient() {
   const [comparisons, setComparisons] = useState<Comparison[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchComparisons = async () => {
+    setLoading(true);
     const { data, error } = await supabase
       .from("comparisons")
       .select("*") // Select all columns based on the new type
@@ -115,6 +117,7 @@ export default function DashboardClient() {
       setError(error.message);
     } else {
       setComparisons(data || []);
+      setLoading(false);
     }
   };
 
@@ -288,7 +291,10 @@ export default function DashboardClient() {
           </tbody>
         </table>
       </div>
-      {comparisons.length === 0 && !error && (
+      {loading && (
+        <p className="text-center text-gray-500 mt-8">Loading data...</p>
+      )}
+      {comparisons.length === 0 && !error && !loading && (
         <p className="text-center text-gray-500 mt-8">
           No comparison data available yet.
         </p>
