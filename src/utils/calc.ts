@@ -44,14 +44,14 @@ export function performPairedTTest(before: number[], after: number[]) {
 }
 
 export function performWilcoxonSignedRankTest(
-  sample1: number[],
-  sample2: number[]
+  after: number[],
+  before: number[]
 ) {
-  if (sample1.length !== sample2.length || sample1.length < 5) {
+  if (after.length !== before.length || after.length < 5) {
     throw new Error("Samples must be equal length and have at least 5 items.");
   }
 
-  const differences = sample1.map((val, i) => val - sample2[i]);
+  const differences = after.map((val, i) => val - before[i]);
 
   // Exclude zero differences
   const filtered = differences
@@ -68,7 +68,7 @@ export function performWilcoxonSignedRankTest(
     };
   }
 
-  if (filtered.length < sample1.length / 2) {
+  if (filtered.length < after.length / 2) {
     console.warn("Many zero differences. Results may be unreliable.");
   }
 
@@ -104,10 +104,11 @@ export function performWilcoxonSignedRankTest(
   // Normal approximation (with continuity correction)
   const meanW = (n * (n + 1)) / 4; //expected sum of ranks
   const stdW = Math.sqrt((n * (n + 1) * (2 * n + 1)) / 24);
-  const z = (W - meanW + 0.5) / stdW; // +0.5 for continuity correction
+  const z = (Wpos - meanW - 0.5) / stdW;
 
   // Handle extreme z-values
-  const pValue = Math.abs(z) > 6 ? 0 : 2 * (1 - normalCDF(Math.abs(z)));
+  /* const pValue = Math.abs(z) > 6 ? 0 : 2 * (1 - normalCDF(Math.abs(z))); */
+  const pValue = 1 - normalCDF(z);
 
   return {
     W,
@@ -139,4 +140,33 @@ function erf(x: number): number {
     1 - ((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
 
   return sign * y;
+}
+
+export function calculateIQR(array: number[]) {
+  const sorted = [...array].sort((a, b) => a - b);
+  const q1Index = Math.floor((sorted.length - 1) * 0.25);
+  const q3Index = Math.floor((sorted.length - 1) * 0.75);
+  const IQR = sorted[q3Index] - sorted[q1Index];
+  return {
+    q1: sorted[q1Index],
+    q3: sorted[q3Index],
+    iqr: IQR,
+    lowerBound: sorted[q1Index] - 1.5 * IQR,
+    upperBound: sorted[q3Index] + 1.5 * IQR,
+  };
+}
+
+export function calculateMedian(array: number[]) {
+  const sorted = [...array].sort((a, b) => a - b);
+  if (array.length % 2 === 0) {
+    const mid1 = sorted[sorted.length / 2 - 1];
+    const mid2 = sorted[sorted.length / 2];
+    return (mid1 + mid2) / 2;
+  } else {
+    return sorted[Math.floor(sorted.length / 2)];
+  }
+}
+
+export function calculateEffectSizeNonParametric(z: number, n: number) {
+  return Math.abs(z) / Math.sqrt(n);
 }

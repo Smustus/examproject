@@ -35,7 +35,7 @@ const TokenUsageChart = ({ chartData }: { chartData: any }) => {
       { label: "Enhanced", avgTokens: avgEnhanced.toFixed() },
     ];
   };
-  console.log(calcAvgTokenUsage());
+  /*   console.log(calcAvgTokenUsage()); */
 
   const chartData2 = calcAvgTokenUsage();
 

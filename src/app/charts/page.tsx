@@ -4,7 +4,10 @@ import { supabase } from "@/utils/supabase";
 import Chart from "@/components/chart";
 import {
   calculateConfidenceInterval,
+  calculateEffectSizeNonParametric,
+  calculateIQR,
   calculateMean,
+  calculateMedian,
   calculateStandardDeviation,
   performPairedTTest,
   performWilcoxonSignedRankTest,
@@ -62,6 +65,30 @@ export default function ChartsPage() {
     [comparisons]
   );
 
+  const enhancedIQR = useMemo(() => {
+    const IQR = calculateIQR(enhancedScores);
+
+    return `
+      ${IQR.q1} - 
+      ${IQR.q3}
+    `;
+  }, [enhancedScores]);
+
+  const baseIQR = useMemo(() => {
+    const IQR = calculateIQR(baseScores);
+    return `
+      ${IQR.q1} -
+      ${IQR.q3}
+    `;
+  }, [baseScores]);
+
+  /*  useEffect(() => {
+    console.log("Base: ");
+    console.log(baseScores);
+    console.log("Enhanced: ");
+    console.log(enhancedScores);
+  }, [baseScores, comparisons, enhancedScores]); */
+
   // Run Shapiro-Wilk test when scoreDiff changes
   const runNormalityTest = async (data: number[]) => {
     try {
@@ -114,13 +141,22 @@ export default function ChartsPage() {
           <div className="">
             <h2 className="font-semibold mb-2">Data</h2>
             <p>Entries: {scoreDiff.length}</p>
-            <p>Mean: {calculateMean(scoreDiff).toFixed(4)}</p>
+            <p>Mean diff: {calculateMean(scoreDiff).toFixed(4)}</p>
             <p>{`CI (95%): ${calculateConfidenceInterval(
               scoreDiff
             ).lowerBound.toFixed(2)} - ${calculateConfidenceInterval(
               scoreDiff
             ).upperBound.toFixed(2)}`}</p>
             <p>SD: {calculateStandardDeviation(scoreDiff).toFixed(4)}</p>
+          </div>
+        }
+        {
+          <div className="">
+            <h2 className="font-semibold mb-2 opacity-0">Data</h2>
+            <p>Median Without: {calculateMedian(baseScores)}</p>
+            <p>Median With: {calculateMedian(enhancedScores)}</p>
+            <p>IQR Without: {baseIQR}</p>
+            <p>IQR With: {enhancedIQR}</p>
           </div>
         }
         {normalityResult.isNormal !== null && (
@@ -158,14 +194,25 @@ export default function ChartsPage() {
             ) : (
               <>
                 <p>W: {testResult.W}</p>
-                <p>z-statistic: {testResult.zStatistic.toFixed(4)}</p>
-                <p>p-value: {testResult.pValue}</p>{" "}
-                {/* The probability of seeing such an W statistic by chance if there was really no difference. */}
+                <p>z-statistic: {testResult.zStatistic.toFixed(6)}</p>
                 <p>
+                  p-value: {testResult.pValue}{" "}
+                  {testResult.isSignificant ? "✅" : "❌"}
+                </p>{" "}
+                {/* The probability of seeing such an W statistic by chance if there was really no difference. */}
+                {/* <p>
                   Result:{" "}
                   {testResult.isSignificant
                     ? "Significant ✅"
                     : "Not significant ❌"}
+                </p> */}
+                <p>
+                  Effect Size:{" "}
+                  {calculateEffectSizeNonParametric(
+                    //0.1 = Small effect 0.3 = Medium effect 0.5+ = Large effect
+                    testResult.zStatistic,
+                    comparisons.length
+                  )}
                 </p>
               </>
             )}
