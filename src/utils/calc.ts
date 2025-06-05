@@ -15,14 +15,22 @@ export function calculateStandardDeviation(array: number[]) {
   const avgSquareDiff = calculateMean(squareDiffs);
   return Math.sqrt(avgSquareDiff);
 }
-export function calculateConfidenceInterval(array: number[]) {
-  const mean = calculateMean(array);
+export function calculateConfidenceInterval(
+  array: number[],
+  normalDistribution: boolean
+) {
+  let type;
+  if (normalDistribution) {
+    type = calculateMean(array);
+  } else {
+    type = calculateMedian(array);
+  }
   const standardDeviation = calculateStandardDeviation(array);
   const zScore = 1.96;
   const marginOfError = zScore * (standardDeviation / Math.sqrt(array.length));
   return {
-    lowerBound: mean - marginOfError,
-    upperBound: mean + marginOfError,
+    lowerBound: type - marginOfError,
+    upperBound: type + marginOfError,
   };
 }
 

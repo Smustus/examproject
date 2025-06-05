@@ -34,7 +34,6 @@ const EvaluationSchema = z.object({
 });
 
 export async function POST(req: Request) {
-  /* const { messages } = await req.json(); */
   try {
     const data = await req.json();
     const {
@@ -133,7 +132,7 @@ export async function POST(req: Request) {
       - Reflect real-world usefulness and trustworthiness.
         If a response fails in a critical category (e.g., factual accuracy or addressing the core user prompt), its overall score should reflect that failure even if other areas are strong.
         Conversely, a response that is technically correct but ignores key tone/formatting/system constraints should be penalized on completeness and tone, even if its content is strong.
-      - If you considerany response to be better than the other, give it atlast a 1 point higher score then the other response
+      - If you considerany response to be better than the other, give it atleast a 1 point higher score then the other response
 
       Generate your output to match the required structure exactly. Do not include explanations or extra commentary outside of the structured data.
 

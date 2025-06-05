@@ -142,10 +142,13 @@ export default function ChartsPage() {
             <h2 className="font-semibold mb-2">Data</h2>
             <p>Entries: {scoreDiff.length}</p>
             <p>Mean diff: {calculateMean(scoreDiff).toFixed(4)}</p>
+            <p>Median diff: {calculateMedian(scoreDiff).toFixed(4)}</p>
             <p>{`CI (95%): ${calculateConfidenceInterval(
-              scoreDiff
+              scoreDiff,
+              false
             ).lowerBound.toFixed(2)} - ${calculateConfidenceInterval(
-              scoreDiff
+              scoreDiff,
+              false
             ).upperBound.toFixed(2)}`}</p>
             <p>SD: {calculateStandardDeviation(scoreDiff).toFixed(4)}</p>
           </div>

@@ -30,6 +30,7 @@ const Chart = ({ chartData }: { chartData: any }) => {
     }));
   };
   const chartData2 = calcFrequency(chartData);
+  console.log(chartData2);
 
   return (
     <ChartContainer config={chartConfig} className="min-h-[200px] w-full">
